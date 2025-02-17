@@ -1,4 +1,4 @@
-# time_logger
+# Time Logger
 
 A new Flutter project.
 
