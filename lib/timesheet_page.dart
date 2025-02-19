@@ -276,9 +276,9 @@ class TimesheetPageState extends State<TimesheetPage> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: <Widget>[
                                         Text('Date: ${DateFormat('MM-dd-yyyy').format(DateTime.parse(record['date']))}'),
-                                        Text('Total Hours: $totalHours'),
-                                        Text('Night Differential Hours: $nightDifferentialHours'),
-                                        Text('Night Differential Pay: P$nightDifferentialPay'),
+                                        Text('Night Diff Hours: $nightDifferentialHours'),
+                                        Text('Night Diff Pay: P$nightDifferentialPay'),
+                                        Text('Total Hours: $totalHours'),                                        
                                       ],
                                     ),
                                   ),
@@ -286,7 +286,7 @@ class TimesheetPageState extends State<TimesheetPage> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: <Widget>[
-                                        Text('Work Type: ${record['work_type']}'),
+                                        Text('Type: ${record['work_type']}'),
                                         Text('Total Pay: P$totalPay'),
                                       ],
                                     ),

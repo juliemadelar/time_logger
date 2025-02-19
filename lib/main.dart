@@ -63,25 +63,7 @@ class MyAppState extends State<MyApp> {
           ),
         ),
       ),
-      home: Scaffold(
-        body: Stack(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/time_logger_logo.png'),
-                  fit: BoxFit.cover,
-                  colorFilter: ColorFilter.mode(
-                    Colors.black.withAlpha((0.2 * 255).toInt()), // Adjust the opacity here
-                    BlendMode.dstATop,
-                  ),
-                ),
-              ),
-            ),
-            HomePage(onThemeChanged: _toggleTheme),
-          ],
-        ),
-      ),
+      home: HomePage(onThemeChanged: _toggleTheme),
     );
   }
 }

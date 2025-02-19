@@ -165,7 +165,9 @@ class _TimeInPageState extends State<TimeInPage> {
                           });
                         }
                       },
-                      child: Text(_selectedDate.toLocal().toString().split(' ')[0]),
+                      child: Text(
+                        "${_selectedDate.toLocal().year}-${_selectedDate.toLocal().month.toString().padLeft(2, '0')}-${_selectedDate.toLocal().day.toString().padLeft(2, '0')}",
+                      ),
                     ),
                     DropdownButtonFormField<String>(
                       value: _selectedTimeIn,
@@ -207,7 +209,7 @@ class _TimeInPageState extends State<TimeInPage> {
                     ),
                     DropdownButtonFormField<String>(
                       value: _selectedWorkType,
-                      hint: Text('Select Work Type'),
+                      hint: Text('Select Type'),
                       onChanged: (String? newValue) {
                         setState(() {
                           _selectedWorkType = newValue!;
@@ -248,8 +250,14 @@ class _TimeInPageState extends State<TimeInPage> {
                   itemBuilder: (context, index) {
                     final record = _timeInRecords[index];
                     return ListTile(
-                      title: Text('Date: ${record['date']}'),
-                      subtitle: Text('Time In: ${record['time_in']}, Time Out: ${record['time_out']}, Work Type: ${record['work_type']}'),
+                      title: Text('Date: ${record['date'].split('T')[0]}'),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('${record['time_in']} - ${record['time_out']}'),
+                          Text('Work Type: ${record['work_type']}'),
+                        ],
+                      ),
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: <Widget>[
