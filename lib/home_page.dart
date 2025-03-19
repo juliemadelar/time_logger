@@ -1,6 +1,7 @@
 // ignore_for_file: use_key_in_widget_constructors
 
 import 'package:flutter/material.dart';
+import 'package:time_logger/widgets/square_icon_button.dart';
 import 'background_widget.dart';
 import 'time_in_page.dart';
 import 'timesheet_page.dart';
@@ -16,7 +17,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'My Time Logger',
+          "Julie's Time Logger",
           style: TextStyle(
             fontFamily: 'Poppins',
             fontSize: 24.0, // Make the title bigger
@@ -34,41 +35,57 @@ class HomePage extends StatelessWidget {
         centerTitle: true, // Center the title
       ),
       body: BackgroundWidget(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => TimeInPage()),
-                  );
-                },
-                child: Text('Time In'),
-              ),
-              SizedBox(height: 16.0), // Add space between buttons
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => TimesheetPage()),
-                  );
-                },
-                child: Text('Timesheet'),
-              ),
-              SizedBox(height: 16.0), // Add space between buttons
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SettingsPage(onThemeChanged: onThemeChanged)),
-                  );
-                },
-                child: Text('Settings'),
-              ),
-            ],
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                SquareIconButton(
+                  text: "Time In",
+                  icon: Icons.punch_clock,
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => TimeInPage()),
+                    );
+                  },
+                ),
+
+                SizedBox(width: 10.0), // Add space between buttons
+                SquareIconButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => TimesheetPage()),
+                    );
+                  },
+                  text: "Timesheet",
+                  icon: Icons.ballot,
+                ),
+              ],
+            ),
+            SizedBox(
+              height: 10.0,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SquareIconButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              SettingsPage(onThemeChanged: onThemeChanged)),
+                    );
+                  },
+                  icon: Icons.settings,
+                  text: 'Settings',
+                ),
+              ],
+            )
+          ],
         ),
       ),
     );
