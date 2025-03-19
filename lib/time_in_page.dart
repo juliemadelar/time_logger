@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:time_range/time_range.dart';
 import 'background_widget.dart';
 
 class TimeInPage extends StatefulWidget {
@@ -76,7 +77,25 @@ class _TimeInPageState extends State<TimeInPage> {
     });
   }
 
-  Future<void> _saveTimeIn() async {
+  Future<bool> _saveTimeIn(context) async {
+    // check if states are null
+    if (_selectedTimeIn == null || _selectedTimeOut == null) {
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                icon: Icon(Icons.warning),
+                title: Text("Please input time"),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, 'OK'),
+                    child: const Text('OK'),
+                  )
+                ],
+              ));
+
+      return false;
+    }
+
     final db = await _getDatabase();
     final record = {
       'date': _selectedDate.toIso8601String(),
@@ -86,12 +105,14 @@ class _TimeInPageState extends State<TimeInPage> {
     };
 
     if (widget.initialRecord == null) {
-      await db.insert('time_in', record, conflictAlgorithm: ConflictAlgorithm.replace);
+      await db.insert('time_in', record,
+          conflictAlgorithm: ConflictAlgorithm.replace);
     } else {
-      await db.update('time_in', record, where: 'id = ?', whereArgs: [widget.initialRecord!['id']]);
+      await db.update('time_in', record,
+          where: 'id = ?', whereArgs: [widget.initialRecord!['id']]);
     }
 
-    _fetchTimeInRecords();
+    return true;
   }
 
   Future<void> _deleteRecord(int id) async {
@@ -125,7 +146,7 @@ class _TimeInPageState extends State<TimeInPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Time In',
+          'Log Time',
           style: TextStyle(
             fontFamily: 'Poppins',
             fontSize: 24.0, // Make the title bigger
@@ -169,44 +190,71 @@ class _TimeInPageState extends State<TimeInPage> {
                         "${_selectedDate.toLocal().year}-${_selectedDate.toLocal().month.toString().padLeft(2, '0')}-${_selectedDate.toLocal().day.toString().padLeft(2, '0')}",
                       ),
                     ),
-                    DropdownButtonFormField<String>(
-                      value: _selectedTimeIn,
-                      hint: Text('Select Time In'),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          _selectedTimeIn = newValue!;
-                          _selectedTimeOut = null; // Reset TimeOut selection
-                          _updateTimeOutOptions();
-                        });
-                      },
-                      items: <String>['6:00 AM', '6:00 PM']
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      validator: (value) =>
-                          value == null ? 'Field cannot be empty' : null,
+                    SizedBox(
+                      height: 16.0,
                     ),
-                    DropdownButtonFormField<String>(
-                      value: _selectedTimeOut,
-                      hint: Text('Select Time Out'),
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          _selectedTimeOut = newValue!;
-                        });
-                      },
-                      items: _timeOutOptions
-                          .map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      validator: (value) =>
-                          value == null ? 'Field cannot be empty' : null,
+                    TimeRange(
+                        timeBlock: 15,
+                        onRangeCompleted: (result) {
+                          debugPrint(result?.start.format(context));
+
+                          setState(() {
+                            _selectedTimeIn = result?.start.format(context);
+                            _selectedTimeOut = result?.end
+                                .format(context); // Reset TimeOut selection
+                            _updateTimeOutOptions();
+                          });
+                          // showDialog(
+                          //     context: context,
+                          //     builder: (context) => AlertDialog(
+                          //           content: Text("data"),
+                          //           actions: [],
+                          //         ));
+                        },
+                        firstTime: TimeOfDay(hour: 0, minute: 0),
+                        lastTime: TimeOfDay(hour: 23, minute: 59)),
+                    SizedBox(
+                      height: 16.0,
                     ),
+                    // DropdownButtonFormField<String>(
+                    //   value: _selectedTimeIn,
+                    //   hint: Text('Select Time In'),
+                    //   onChanged: (String? newValue) {
+                    //     debugPrint(newValue);
+                    //     setState(() {
+                    //       _selectedTimeIn = newValue!;
+                    //       _selectedTimeOut = null; // Reset TimeOut selection
+                    //       _updateTimeOutOptions();
+                    //     });
+                    //   },
+                    //   items: <String>['6:00 AM', '6:00 PM']
+                    //       .map<DropdownMenuItem<String>>((String value) {
+                    //     return DropdownMenuItem<String>(
+                    //       value: value,
+                    //       child: Text(value),
+                    //     );
+                    //   }).toList(),
+                    //   validator: (value) =>
+                    //       value == null ? 'Field cannot be empty' : null,
+                    // ),
+                    // DropdownButtonFormField<String>(
+                    //   value: _selectedTimeOut,
+                    //   hint: Text('Select Time Out'),
+                    //   onChanged: (String? newValue) {
+                    //     setState(() {
+                    //       _selectedTimeOut = newValue!;
+                    //     });
+                    //   },
+                    //   items: _timeOutOptions
+                    //       .map<DropdownMenuItem<String>>((String value) {
+                    //     return DropdownMenuItem<String>(
+                    //       value: value,
+                    //       child: Text(value),
+                    //     );
+                    //   }).toList(),
+                    //   validator: (value) =>
+                    //       value == null ? 'Field cannot be empty' : null,
+                    // ),
                     DropdownButtonFormField<String>(
                       value: _selectedWorkType,
                       hint: Text('Select Type'),
@@ -232,11 +280,14 @@ class _TimeInPageState extends State<TimeInPage> {
                     ElevatedButton(
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
-                          await _saveTimeIn();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Time in has been recorded')),
-                          );
-                          _fetchTimeInRecords();
+                          var result = await _saveTimeIn(context);
+                          if (result) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text('Time in has been recorded')),
+                            );
+                            _fetchTimeInRecords();
+                          }
                         }
                       },
                       child: Text('Submit'),

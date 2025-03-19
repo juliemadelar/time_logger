@@ -42,7 +42,7 @@ class HomePage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 SquareIconButton(
-                  text: "Time In",
+                  text: "Log Time",
                   icon: Icons.punch_clock,
                   onPressed: () {
                     Navigator.push(
