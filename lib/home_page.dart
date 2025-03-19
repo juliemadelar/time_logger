@@ -17,7 +17,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Julie's Time Logger",
+          "JTime Logger",
           style: TextStyle(
             fontFamily: 'Poppins',
             fontSize: 24.0, // Make the title bigger
@@ -43,6 +43,7 @@ class HomePage extends StatelessWidget {
               children: <Widget>[
                 SquareIconButton(
                   text: "Log Time",
+                  size: 150,
                   icon: Icons.punch_clock,
                   onPressed: () {
                     Navigator.push(
@@ -54,6 +55,7 @@ class HomePage extends StatelessWidget {
 
                 SizedBox(width: 10.0), // Add space between buttons
                 SquareIconButton(
+                  size: 150,
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -72,6 +74,7 @@ class HomePage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SquareIconButton(
+                  size: 150,
                   onPressed: () {
                     Navigator.push(
                       context,

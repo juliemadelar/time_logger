@@ -42,27 +42,29 @@ class MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'My Time Logger',
-      theme: _isDarkMode ? ThemeData.dark() : ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.pink, // Set app bar color to pink
-          centerTitle: true, // Center the title
-          titleTextStyle: TextStyle(
-            fontFamily: 'Poppins',
-            fontSize: 24.0, // Make the title bigger
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-            shadows: [
-              Shadow(
-                offset: Offset(2.0, 2.0),
-                blurRadius: 3.0,
-                color: Color.fromARGB(255, 0, 0, 0),
+      title: 'JTime Logger',
+      theme: _isDarkMode
+          ? ThemeData.dark()
+          : ThemeData(
+              colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+              appBarTheme: AppBarTheme(
+                backgroundColor: Colors.pink, // Set app bar color to pink
+                centerTitle: true, // Center the title
+                titleTextStyle: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 24.0, // Make the title bigger
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  shadows: [
+                    Shadow(
+                      offset: Offset(2.0, 2.0),
+                      blurRadius: 3.0,
+                      color: Color.fromARGB(255, 0, 0, 0),
+                    ),
+                  ],
+                ),
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
       home: HomePage(onThemeChanged: _toggleTheme),
     );
   }
