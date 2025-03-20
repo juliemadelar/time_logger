@@ -1,6 +1,7 @@
 // ignore_for_file: use_key_in_widget_constructors
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'home_page.dart';
@@ -9,6 +10,9 @@ void main() {
   // Initialize database factory for FFI
   sqfliteFfiInit();
   databaseFactory = databaseFactoryFfi;
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.po]);
   runApp(MyApp());
 }
 
@@ -43,6 +47,7 @@ class MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'JTime Logger',
+      debugShowCheckedModeBanner: false,
       theme: _isDarkMode
           ? ThemeData.dark()
           : ThemeData(
