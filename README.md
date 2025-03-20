@@ -1,6 +1,6 @@
 # Time Logger
 
-A new Flutter project.
+A Flutter project for logging working hours.
 
 ## Getting Started
 
@@ -18,3 +18,6 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+
+[![Get it on Google Play](playstore.png)](https://play.google.com/store/apps/details?id=com.julzweb.time_app_android2)
