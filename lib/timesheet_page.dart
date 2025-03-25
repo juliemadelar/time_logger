@@ -104,7 +104,8 @@ class TimesheetPageState extends State<TimesheetPage> {
       if (timeIn != null && timeOut != null) {
         final hours = _computeTotalHours(timeIn, timeOut);
         totalHours += hours;
-        totalPay += _computeTotalPay(hours, timeIn, timeOut, record['work_type']);
+        totalPay +=
+            _computeTotalPay(hours, timeIn, timeOut, record['work_type']);
       }
     }
 
@@ -120,7 +121,8 @@ class TimesheetPageState extends State<TimesheetPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _hourlyRate = prefs.getDouble('hourlyRate') ?? 65.00;
-      _nightDifferentialRate = (prefs.getDouble('nightDifferentialRate') ?? 0.10); // Load night differential rate as decimal
+      _nightDifferentialRate = (prefs.getDouble('nightDifferentialRate') ??
+          0.10); // Load night differential rate as decimal
     });
   }
 
@@ -135,7 +137,11 @@ class TimesheetPageState extends State<TimesheetPage> {
     }
 
     final difference = timeOutDate.difference(timeInDate);
-    final totalHours = difference.inMinutes / 60.0 - 1; // Subtract 1 hour for lunch break
+    var totalHours =
+        difference.inMinutes / 60.0 - 1; // Subtract 1 hour for lunch break
+    if (totalHours < 0) {
+      totalHours = 0; // prevent negative
+    }
     return totalHours;
   }
 
@@ -150,8 +156,10 @@ class TimesheetPageState extends State<TimesheetPage> {
     }
 
     double nightHours = 0.0;
-    final nightStart = DateTime(timeInDate.year, timeInDate.month, timeInDate.day, 22);
-    final nightEnd = DateTime(timeOutDate.year, timeOutDate.month, timeOutDate.day, 6);
+    final nightStart =
+        DateTime(timeInDate.year, timeInDate.month, timeInDate.day, 22);
+    final nightEnd =
+        DateTime(timeOutDate.year, timeOutDate.month, timeOutDate.day, 6);
 
     if (timeInDate.isBefore(nightEnd) && timeOutDate.isAfter(nightStart)) {
       final start = timeInDate.isBefore(nightStart) ? nightStart : timeInDate;
@@ -169,27 +177,41 @@ class TimesheetPageState extends State<TimesheetPage> {
     return totalHours > 9 ? totalHours - 9 : 0;
   }
 
-  double _computeTotalPay(double totalHours, String timeIn, String timeOut, String workType) {
-    double dailyRate = _hourlyRate * 9;
-    double nightDifferentialHours = _computeNightDifferentialHours(timeIn, timeOut);
-    double nightDifferentialPay = nightDifferentialHours * (_hourlyRate * _nightDifferentialRate);
+  double _computeTotalPay(
+      double totalHours, String timeIn, String timeOut, String workType) {
+    double dailyRate = _hourlyRate * totalHours;
+    double nightDifferentialHours =
+        _computeNightDifferentialHours(timeIn, timeOut);
+    double nightDifferentialPay =
+        nightDifferentialHours * (_hourlyRate * _nightDifferentialRate);
     double overtimeHours = _computeOvertimeHours(totalHours);
     double overtimePay = overtimeHours * (_hourlyRate * _overtimeRate);
     double totalPay = dailyRate + nightDifferentialPay + overtimePay;
 
     if (workType == 'Regular Holiday') {
-      totalPay = 8 * _hourlyRate * 2; // 8 hours multiplied by hourly rate multiplied by 200%
-      if ((timeIn == '6:00 AM' && timeOut == '4:00 PM') || (timeIn == '6:00 PM' && timeOut == '4:00 AM')) {
+      totalPay = 8 *
+          _hourlyRate *
+          2; // 8 hours multiplied by hourly rate multiplied by 200%
+      if ((timeIn == '6:00 AM' && timeOut == '4:00 PM') ||
+          (timeIn == '6:00 PM' && timeOut == '4:00 AM')) {
         totalPay += 1 * _hourlyRate * 2.3; // 1 hour overtime multiplied by 230%
-      } else if ((timeIn == '6:00 AM' && timeOut == '5:30 PM') || (timeIn == '6:00 PM' && timeOut == '5:30 AM')) {
-        totalPay += 2.5 * _hourlyRate * 2.3; // 2.5 hours overtime multiplied by 230%
+      } else if ((timeIn == '6:00 AM' && timeOut == '5:30 PM') ||
+          (timeIn == '6:00 PM' && timeOut == '5:30 AM')) {
+        totalPay +=
+            2.5 * _hourlyRate * 2.3; // 2.5 hours overtime multiplied by 230%
       }
     } else if (workType == 'Special Holiday' || workType == 'Restday OT') {
-      totalPay = 8 * _hourlyRate * 1.3; // 8 hours multiplied by hourly rate multiplied by 130%
-      if ((timeIn == '6:00 AM' && timeOut == '4:00 PM') || (timeIn == '6:00 PM' && timeOut == '4:00 AM')) {
-        totalPay += 1 * _hourlyRate * 1.69; // 1 hour overtime multiplied by 169%
-      } else if ((timeIn == '6:00 AM' && timeOut == '5:30 PM') || (timeIn == '6:00 PM' && timeOut == '5:30 AM')) {
-        totalPay += 2.5 * _hourlyRate * 1.69; // 2.5 hours overtime multiplied by 169%
+      totalPay = 8 *
+          _hourlyRate *
+          1.3; // 8 hours multiplied by hourly rate multiplied by 130%
+      if ((timeIn == '6:00 AM' && timeOut == '4:00 PM') ||
+          (timeIn == '6:00 PM' && timeOut == '4:00 AM')) {
+        totalPay +=
+            1 * _hourlyRate * 1.69; // 1 hour overtime multiplied by 169%
+      } else if ((timeIn == '6:00 AM' && timeOut == '5:30 PM') ||
+          (timeIn == '6:00 PM' && timeOut == '5:30 AM')) {
+        totalPay +=
+            2.5 * _hourlyRate * 1.69; // 2.5 hours overtime multiplied by 169%
       }
     }
 
@@ -236,7 +258,8 @@ class TimesheetPageState extends State<TimesheetPage> {
                     icon: Icon(Icons.arrow_back),
                     onPressed: _previousCutOff,
                   ),
-                  Flexible( // Change from Expanded to Flexible
+                  Flexible(
+                    // Change from Expanded to Flexible
                     child: Text(
                       '${DateFormat('MM/dd/yyyy').format(_startDate)} - ${DateFormat('MM/dd/yyyy').format(_endDate)}',
                       style: TextStyle(fontSize: 16.0),
@@ -251,7 +274,8 @@ class TimesheetPageState extends State<TimesheetPage> {
               ),
               _isLoading
                   ? Center(child: CircularProgressIndicator())
-                  : Expanded( // Wrap ListView.builder with Expanded
+                  : Expanded(
+                      // Wrap ListView.builder with Expanded
                       child: ListView.builder(
                         itemCount: _timeInRecords.length,
                         itemBuilder: (context, index) {
@@ -261,10 +285,14 @@ class TimesheetPageState extends State<TimesheetPage> {
                           if (timeIn == null || timeOut == null) {
                             return Container();
                           }
-                          final totalHours = _computeTotalHours(timeIn, timeOut);
-                          final totalPay = _computeTotalPay(totalHours, timeIn, timeOut, record['work_type']);
-                          final nightDifferentialHours = _computeNightDifferentialHours(timeIn, timeOut);
-                          final nightDifferentialPay = nightDifferentialHours * (_hourlyRate * _nightDifferentialRate);
+                          final totalHours =
+                              _computeTotalHours(timeIn, timeOut);
+                          final totalPay = _computeTotalPay(
+                              totalHours, timeIn, timeOut, record['work_type']);
+                          final nightDifferentialHours =
+                              _computeNightDifferentialHours(timeIn, timeOut);
+                          final nightDifferentialPay = nightDifferentialHours *
+                              (_hourlyRate * _nightDifferentialRate);
                           return GestureDetector(
                             onTap: () {
                               // Expand details
@@ -273,31 +301,46 @@ class TimesheetPageState extends State<TimesheetPage> {
                               margin: EdgeInsets.symmetric(vertical: 8.0),
                               padding: EdgeInsets.all(16.0),
                               decoration: BoxDecoration(
-                                color: Theme.of(context).brightness == Brightness.dark
+                                color: Theme.of(context).brightness ==
+                                        Brightness.dark
                                     ? Colors.grey[800]
                                     : Colors.grey[200],
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: <Widget>[
-                                  Flexible( // Change from Expanded to Flexible
+                                  Flexible(
+                                    // Change from Expanded to Flexible
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: <Widget>[
-                                        Text('Date: ${DateFormat('MM-dd-yyyy').format(DateTime.parse(record['date']))}'),
-                                        Text('Night Diff Hours: $nightDifferentialHours'),
-                                        Text('Night Diff Pay: P$nightDifferentialPay'),
-                                        Text('Total Hours: $totalHours'),                                        
+                                        Text(
+                                          DateFormat('dd-MMMM-yyyy').format(
+                                              DateTime.parse(record['date'])),
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Text(
+                                            'Night Diff Hrs: $nightDifferentialHours'),
+                                        Text(
+                                            'Night Diff Pay: P$nightDifferentialPay'),
+                                        Text('Total Hours: $totalHours'),
                                       ],
                                     ),
                                   ),
-                                  Flexible( // Change from Expanded to Flexible
+                                  Flexible(
+                                    // Change from Expanded to Flexible
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: <Widget>[
+                                        Text('In: ${record['time_in']}'),
+                                        Text('Out: ${record['time_out']}'),
                                         Text('Type: ${record['work_type']}'),
-                                        Text('Total Pay: P$totalPay'),
+                                        Text('Total Pay: ₱$totalPay'),
                                       ],
                                     ),
                                   ),
@@ -306,7 +349,8 @@ class TimesheetPageState extends State<TimesheetPage> {
                                     children: <Widget>[
                                       IconButton(
                                         icon: Icon(Icons.delete),
-                                        onPressed: () => _deleteRecord(record['id']),
+                                        onPressed: () =>
+                                            _deleteRecord(record['id']),
                                       ),
                                     ],
                                   ),
@@ -321,8 +365,12 @@ class TimesheetPageState extends State<TimesheetPage> {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: <Widget>[
-                    Text('Total Hours: $_totalHours', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
-                    Text('Total Pay: P$_totalPay', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                    Text('Total Hours: $_totalHours',
+                        style: TextStyle(
+                            fontSize: 16.0, fontWeight: FontWeight.bold)),
+                    Text('Total Pay: P$_totalPay',
+                        style: TextStyle(
+                            fontSize: 16.0, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
