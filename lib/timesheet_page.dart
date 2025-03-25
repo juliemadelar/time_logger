@@ -189,7 +189,7 @@ class TimesheetPageState extends State<TimesheetPage> {
     double totalPay = dailyRate + nightDifferentialPay + overtimePay;
 
     if (workType == 'Regular Holiday') {
-      totalPay = 8 *
+      totalPay = totalHours *
           _hourlyRate *
           2; // 8 hours multiplied by hourly rate multiplied by 200%
       if ((timeIn == '6:00 AM' && timeOut == '4:00 PM') ||
@@ -201,7 +201,7 @@ class TimesheetPageState extends State<TimesheetPage> {
             2.5 * _hourlyRate * 2.3; // 2.5 hours overtime multiplied by 230%
       }
     } else if (workType == 'Special Holiday' || workType == 'Restday OT') {
-      totalPay = 8 *
+      totalPay = totalHours *
           _hourlyRate *
           1.3; // 8 hours multiplied by hourly rate multiplied by 130%
       if ((timeIn == '6:00 AM' && timeOut == '4:00 PM') ||
