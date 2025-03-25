@@ -15,8 +15,9 @@ class SettingsPage extends StatefulWidget {
 class SettingsPageState extends State<SettingsPage> {
   bool _isDarkMode = false;
   TextEditingController _hourlyRateController = TextEditingController();
-  TextEditingController _nightDifferentialRateController = TextEditingController();
-
+  TextEditingController _nightDifferentialRateController =
+      TextEditingController();
+  TextEditingController _timeRangeInterval = TextEditingController();
   @override
   void initState() {
     super.initState();
@@ -27,16 +28,37 @@ class SettingsPageState extends State<SettingsPage> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       _isDarkMode = prefs.getBool('darkMode') ?? false;
-      _hourlyRateController.text = (prefs.getDouble('hourlyRate') ?? 65.00).toString();
-      _nightDifferentialRateController.text = ((prefs.getDouble('nightDifferentialRate') ?? 0.10) * 100).toString();
+      _hourlyRateController.text =
+          (prefs.getDouble('hourlyRate') ?? 65.00).toString();
+      _nightDifferentialRateController.text =
+          ((prefs.getDouble('nightDifferentialRate') ?? 0.10) * 100).toString();
+      _timeRangeInterval.text =
+          (prefs.getInt('timeRangeInterval') ?? 30).toString();
     });
   }
 
   Future<void> _saveSettings() async {
+    final double? hourlyRate = double.tryParse(_hourlyRateController.text);
+    final double? nightDiffRate =
+        double.tryParse(_nightDifferentialRateController.text);
+    final int? timeRangeInterval = int.tryParse(_timeRangeInterval.text);
+    // basic validation
+    if (hourlyRate == null ||
+        nightDiffRate == null ||
+        timeRangeInterval == null) {
+      throw Exception("Invalid Value. Hourly Rate, Night Diff"
+          ", or Time Log interval must be a number");
+    }
+
+    if (timeRangeInterval > 60) {
+      throw Exception("Invalid time range interval value");
+    }
+
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('darkMode', _isDarkMode);
-    await prefs.setDouble('hourlyRate', double.parse(_hourlyRateController.text));
-    await prefs.setDouble('nightDifferentialRate', double.parse(_nightDifferentialRateController.text) / 100);
+    await prefs.setDouble('hourlyRate', hourlyRate);
+    await prefs.setDouble('nightDifferentialRate', nightDiffRate / 100);
+    await prefs.setInt('timeRangeInterval', timeRangeInterval);
   }
 
   @override
@@ -49,7 +71,8 @@ class SettingsPageState extends State<SettingsPage> {
               image: AssetImage('assets/time_logger_logo.png'),
               fit: BoxFit.cover,
               colorFilter: ColorFilter.mode(
-                Colors.black.withAlpha((0.2 * 255).toInt()), // Adjust the opacity here
+                Colors.black
+                    .withAlpha((0.2 * 255).toInt()), // Adjust the opacity here
                 BlendMode.dstATop,
               ),
             ),
@@ -103,13 +126,32 @@ class SettingsPageState extends State<SettingsPage> {
                   ),
                   keyboardType: TextInputType.number,
                 ),
+                SizedBox(height: 16.0),
+                TextFormField(
+                  controller: _timeRangeInterval,
+                  decoration: InputDecoration(
+                    labelText: 'Time Log Interval',
+                  ),
+                  keyboardType: TextInputType.number,
+                ),
                 SizedBox(height: 16.0), // Add space before the button
                 ElevatedButton(
-                  onPressed: () {
-                    _saveSettings();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Settings have been saved')),
-                    );
+                  onPressed: () async {
+                    try {
+                      await _saveSettings();
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Settings have been saved')),
+                        );
+                      }
+                    } catch (error) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                              content: Text(error.toString().substring(11))),
+                        );
+                      }
+                    }
                   },
                   child: Text('Save'),
                 ),

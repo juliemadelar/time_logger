@@ -1,6 +1,7 @@
 // ignore_for_file: file_names, library_private_types_in_public_api, unused_field, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -25,15 +26,18 @@ class _TimeInPageState extends State<TimeInPage> {
   List<Map<String, dynamic>> _timeInRecords = [];
   int? _selectedRecordId;
   List<String> _timeOutOptions = [];
+  int _timeRangeInterval = 30;
 
   @override
   void initState() {
     super.initState();
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
+
     _initializeForm();
     _fetchTimeInRecords();
     _updateTimeOutOptions();
+    _loadPreferences();
   }
 
   void _initializeForm() {
@@ -45,6 +49,12 @@ class _TimeInPageState extends State<TimeInPage> {
     } else {
       _selectedDate = DateTime.now();
     }
+  }
+
+  Future<void> _loadPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    _timeRangeInterval = prefs.getInt('timeRangeInterval') ?? 30;
+    debugPrint("loaded preferences");
   }
 
   Future<String> _getDatabasePath() async {
@@ -194,7 +204,8 @@ class _TimeInPageState extends State<TimeInPage> {
                       height: 16.0,
                     ),
                     TimeRange(
-                        timeBlock: 15,
+                        timeBlock: _timeRangeInterval,
+                        timeStep: _timeRangeInterval,
                         onRangeCompleted: (result) {
                           debugPrint(result?.start.format(context));
 
