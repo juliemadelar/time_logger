@@ -11,8 +11,7 @@ void main() {
   sqfliteFfiInit();
   databaseFactory = databaseFactoryFfi;
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations(
-      [DeviceOrientation.portraitUp, DeviceOrientation.po]);
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(MyApp());
 }
 
