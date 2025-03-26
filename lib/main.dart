@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:time_logger/timesheet_page.dart';
 import 'home_page.dart';
 
 void main() {
@@ -31,6 +32,7 @@ class MyAppState extends State<MyApp> {
 
   Future<void> _loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
+
     setState(() {
       _isDarkMode = prefs.getBool('darkMode') ?? false;
     });

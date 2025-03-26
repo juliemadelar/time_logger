@@ -102,10 +102,10 @@ class TimesheetPageState extends State<TimesheetPage> {
       final timeIn = record['time_in'];
       final timeOut = record['time_out'];
       if (timeIn != null && timeOut != null) {
-        final hours = _computeTotalHours(timeIn, timeOut);
+        final hours = computeTotalHours(timeIn, timeOut);
         totalHours += hours;
         totalPay +=
-            _computeTotalPay(hours, timeIn, timeOut, record['work_type']);
+            computeTotalPay(hours, timeIn, timeOut, record['work_type']);
       }
     }
 
@@ -126,7 +126,8 @@ class TimesheetPageState extends State<TimesheetPage> {
     });
   }
 
-  double _computeTotalHours(String timeIn, String timeOut) {
+  @visibleForTesting
+  double computeTotalHours(String timeIn, String timeOut) {
     final format = DateFormat("hh:mm a");
     final timeInDate = format.parse(timeIn);
     var timeOutDate = format.parse(timeOut);
@@ -173,18 +174,20 @@ class TimesheetPageState extends State<TimesheetPage> {
     return nightHours;
   }
 
-  double _computeOvertimeHours(double totalHours) {
+  @visibleForTesting
+  double computeOvertimeHours(double totalHours) {
     return totalHours > 9 ? totalHours - 9 : 0;
   }
 
-  double _computeTotalPay(
+  @visibleForTesting
+  double computeTotalPay(
       double totalHours, String timeIn, String timeOut, String workType) {
     double dailyRate = _hourlyRate * totalHours;
     double nightDifferentialHours =
         _computeNightDifferentialHours(timeIn, timeOut);
     double nightDifferentialPay =
         nightDifferentialHours * (_hourlyRate * _nightDifferentialRate);
-    double overtimeHours = _computeOvertimeHours(totalHours);
+    double overtimeHours = computeOvertimeHours(totalHours);
     double overtimePay = overtimeHours * (_hourlyRate * _overtimeRate);
     double totalPay = dailyRate + nightDifferentialPay + overtimePay;
 
@@ -285,9 +288,8 @@ class TimesheetPageState extends State<TimesheetPage> {
                           if (timeIn == null || timeOut == null) {
                             return Container();
                           }
-                          final totalHours =
-                              _computeTotalHours(timeIn, timeOut);
-                          final totalPay = _computeTotalPay(
+                          final totalHours = computeTotalHours(timeIn, timeOut);
+                          final totalPay = computeTotalPay(
                               totalHours, timeIn, timeOut, record['work_type']);
                           final nightDifferentialHours =
                               _computeNightDifferentialHours(timeIn, timeOut);
